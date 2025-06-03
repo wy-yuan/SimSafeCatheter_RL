@@ -1,8 +1,9 @@
 import torch, gymnasium as gym
 from stable_baselines3 import PPO
-from catheter_env import Cath2DEnv
 
-env = Cath2DEnv()
+from point_vessel_env import PointVesselEnv
+env = PointVesselEnv()
+
 model = PPO(
     "MlpPolicy",
     env,
@@ -15,5 +16,5 @@ model = PPO(
     tensorboard_log="runs/ppo_cath/",
     verbose=1,
 )
-model.learn(total_timesteps=1_000_000)
-model.save("ppo_cath_tip")
+model.learn(total_timesteps=500_000)
+model.save("ppo_point")

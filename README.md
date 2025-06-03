@@ -9,11 +9,12 @@ Minimal end-to-end project that **learns to steer a 2-D articulated catheter** t
 conda create -n catheter_rl python=3.10 -y
 conda activate catheter_rl
 # deps
+pip install swig
 pip install box2d-py
 pip install gymnasium[box2d] stable-baselines3[extra] numpy matplotlib rich
 ```
 
-### 2  Repo layout
+### 2 Repo layout
 
 | File | Purpose |
 |------|---------|

@@ -32,8 +32,8 @@ DEG2RAD = math.pi / 180
 SEG_LEN_MM = 10
 SEG_THICK_MM = 5
 N_SEG = 6
-ADVANCE_SPEED_MM = 4          # per action step at |adv|=1
-STEER_SPEED_DEG = 6           # per action step at |angle|=1
+ADVANCE_SPEED_MM = 4*10          # per action step at |adv|=1
+STEER_SPEED_DEG = 6*10           # per action step at |angle|=1
 WALL_THICK = 3
 
 # ---------------------------------------------------------------------------
@@ -141,7 +141,8 @@ class Cath2DEnv(gym.Env):
 
         # randomise starting tip and goal
         start = np.array([0.0, 0.0])
-        goal_candidates = [(20, 120), (-15, 160), (25, 150)]
+        # goal_candidates = [(20, 120), (-15, 160), (25, 150)]
+        goal_candidates = [(20, 120)]
         self.goal = np.array(random.choice(goal_candidates), dtype=np.float64)
         self.steps, self.collided = 0, False
 
@@ -267,7 +268,7 @@ class Cath2DEnv(gym.Env):
 if __name__ == "__main__":
     env = Cath2DEnv(render_mode="human")
     obs, _ = env.reset(seed=0)
-    for _ in range(300):
+    for _ in range(3000):
         a = env.action_space.sample()
         obs, r, term, trunc, _ = env.step(a)
         env.render()
