@@ -9,6 +9,8 @@ Simple 2-D navigation task for RL:
 Gymnasium ≥ 0.29  |  Python 3.9+
 """
 from __future__ import annotations
+
+import os.path
 from typing import Tuple, Optional, Dict
 
 import math, random, pygame, numpy as np
@@ -26,15 +28,17 @@ def dist_point_to_segment(pt: np.ndarray, p1: np.ndarray, p2: np.ndarray) -> flo
     proj = v + t * (w - v)
     return float(np.linalg.norm(pt - proj))
 
-def distance_to_polyline(pt: np.ndarray, verts: np.ndarray) -> float:
+def distance_to_polyline(pt: np.ndarray, verts: np.ndarray, verts2: np.ndarray) -> float:
     """Minimum distance from point to any segment in the poly-line."""
     dists = [dist_point_to_segment(pt, verts[i], verts[i + 1])
              for i in range(len(verts) - 1)]
-    return min(dists)
+    dists2 = [dist_point_to_segment(pt, verts2[i], verts2[i + 1])
+             for i in range(len(verts2) - 1)]
+    return min(min(dists), min(dists2))
 
 # ---------------------------------------------------------------------------
 class PointVesselEnv(gym.Env):
-    metadata = {"render_modes": ["human", "rgb_array"], "render_fps": 60}
+    metadata = {"render_modes": ["human", "rgb_array"], "render_fps": 25}
 
     # vessel parameters
     RADIUS   = 1.0        # half-width of vessel (mm or px)
@@ -42,12 +46,17 @@ class PointVesselEnv(gym.Env):
     V_MAX    = 1.0         # mm per step at |a|=1
     GOAL_TOL = 2.0         # success within 2 mm
 
-    def __init__(self, render_mode: Optional[str] = None):
+    def __init__(self, render_mode: Optional[str] = None, save_frames=False):
         super().__init__()
+        self.save_frames = save_frames
+        self.frame_id = 0
         self.render_mode = render_mode
         # poly-line centerline (mm)
         self.verts = np.array([(0, 0), (30, 40), (15, 90),
                                (-20, 130), (10, 180)], dtype=np.float32)
+        self.verts2 = np.array([(-50, 0), (-10, 40), (0, 90),
+                               (-60, 130), (-20, 180)], dtype=np.float32)
+        # self.verts2 = np.array([(-50, 0), (-10, 40), (10, 90), (-60, 130), (-20, 180)], dtype=np.float32)
 
         # -------- Gym spaces ---------------------------------------------
         self.action_space = spaces.Box(low=-1.0, high=1.0,
@@ -96,13 +105,13 @@ class PointVesselEnv(gym.Env):
         progress = d_prev - d_now
         # print("progress:", d_prev, d_now, progress)
         # collision check
-        wall_dist = distance_to_polyline(self.pos, self.verts)
+        wall_dist = distance_to_polyline(self.pos, self.verts, self.verts2)
         collided = (wall_dist - self.RADIUS) < self.OBJ_R
 
         # reward
         reward = 5.0 * progress - 0.05
         if collided:
-            reward -= 5.0
+            reward -= 5.0*4
         terminated = d_now < self.GOAL_TOL and not collided
         truncated  = self.steps >= self.max_steps or collided
         if terminated:
@@ -138,6 +147,11 @@ class PointVesselEnv(gym.Env):
         pts = [(x * self.scale + w // 2, h - (y * self.scale + 40))
                for x, y in verts]
         pygame.draw.lines(self._viewer, (0, 120, 250), False, pts, 2)
+
+        verts = (self.verts2).astype(int)
+        pts = [(x * self.scale + w // 2, h - (y * self.scale + 40))
+               for x, y in verts]
+        pygame.draw.lines(self._viewer, (0, 120, 250), False, pts, 2)
         # # draw walls (simple circles along verts)
         # for p in pts:
         #     pygame.draw.circle(self._viewer, (0, 70, 180), p,
@@ -156,6 +170,10 @@ class PointVesselEnv(gym.Env):
 
         pygame.display.flip()
         self._clock.tick(self.metadata["render_fps"])
+
+        fname = os.path.join("./saved/", f"{self.frame_id:06d}.jpg")
+        pygame.image.save(self._viewer, fname)
+        self.frame_id += 1
 
     def close(self):
         if self._viewer is not None:

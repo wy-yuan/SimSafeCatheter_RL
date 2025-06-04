@@ -51,7 +51,8 @@ def main():
         description="Visualise catheter RL agent")
     parser.add_argument("model", nargs="?", default=None,
                         help="Path to PPO .zip checkpoint (optional)")
-    parser.add_argument("--episodes", type=int, default=5, help="# episodes")
+    parser.add_argument("--episodes", type=int, default=1, help="# episodes")
+    parser.add_argument("--save_frames", type=bool, default=False)
     args = parser.parse_args()
 
     use_model = args.model and Path(args.model).is_file()
@@ -59,7 +60,7 @@ def main():
         sys.exit("Stable-Baselines3 not installed – `pip install stable-baselines3[extra]`")
 
     # env = Cath2DEnv(render_mode="human")
-    env = PointVesselEnv(render_mode="human")
+    env = PointVesselEnv(render_mode="human", save_frames=args.save_frames)
     if use_model:
         model = PPO.load(args.model, env=env, device="cpu")
         print(f"Loaded model {args.model}")

@@ -1,6 +1,7 @@
 # SimSafeCatheter RL
-Minimal end-to-end project that **learns to steer a 2-D articulated catheter** through a virtual vessel using PPO (Stable-Baselines3).
+Minimal end-to-end project that **learns to steer a 2-D articulated catheter** tip through a virtual vessel using PPO (Stable-Baselines3).
 
+<img src='gif/out.gif'>
 ---
 ### 1 Quick install
 
@@ -16,13 +17,13 @@ pip install gymnasium[box2d] stable-baselines3[extra] numpy matplotlib rich
 
 ### 2 Repo layout
 
-| File | Purpose |
-|------|---------|
-| `catheter_env.py` | Gymnasium environment – Box2D world, 6-segment catheter, reward collision logic. |
-| `train.py`        | Trains PPO. |
-| `eval.py`         | Batch-evaluate trained weights; prints success rate, mean tip error, collisions/ep. |
-| `visualize.py`    | Live Pygame viewer; run with or without a model: <br>`python visualize.py ppo_cath_tip.zip`. |
-| `README.md` (*this file*) | Quick-start guide. |
+| File                      | Purpose                                                                                            |
+|---------------------------|----------------------------------------------------------------------------------------------------|
+| `point_vessel_env.py`     | Gymnasium environment – one point represent catheter tip, reward collision logic. (To be upgraded) |
+| `train.py`                | Trains PPO.                                                                                        |
+| `eval.py`                 | Batch-evaluate trained weights; prints success rate, mean tip error, collisions/ep.                |
+| `visualize.py`            | Live Pygame viewer; run with or without a model: <br>`python visualize.py ppo_cath_tip.zip`.       |
+| `README.md` (*this file*) | Quick-start guide.                                                                                 |
 
 ---
 

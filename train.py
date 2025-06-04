@@ -16,5 +16,5 @@ model = PPO(
     tensorboard_log="runs/ppo_cath/",
     verbose=1,
 )
-model.learn(total_timesteps=500_000)
-model.save("ppo_point")
+model.learn(total_timesteps=2_000_000)
+model.save("ppo_point_2wall_rwd_cx4_2Msteps")
