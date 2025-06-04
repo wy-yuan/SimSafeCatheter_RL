@@ -2,6 +2,7 @@
 Minimal end-to-end project that **learns to steer a 2-D articulated catheter** tip through a virtual vessel using PPO (Stable-Baselines3).
 
 <img src='gif/out.gif'>
+
 ---
 ### 1 Quick install
 
